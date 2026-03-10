@@ -1,3 +1,5 @@
+Homework for Week 1, 2, 3, and 4:
+
 Week 1: 
 
 # agentic-ai-observability-lab-
