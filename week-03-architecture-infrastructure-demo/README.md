@@ -1,6 +1,6 @@
 # Week 3 Demo Pack — AI Architecture / Infrastructure
 
-This folder provides a practical submission aligned to Week 3 of the Agentic AI Security Bootcamp:
+(Please use this only for week 3 of the course) This folder provides a practical submission aligned to Week 3 of the Agentic AI Security Bootcamp:
 
 - threat modelling and attack-graph construction for AI data pipelines, orchestration, and model-serving layers
 - a multi-stage poisoned-data simulation with lightweight detection logic
