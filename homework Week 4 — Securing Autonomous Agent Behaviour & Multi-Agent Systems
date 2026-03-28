@@ -1,0 +1,13 @@
+homework/
+└── week-04-agent-autonomy/
+    └── <github-username>/
+        ├── task1_agent_threat_model.md
+        ├── task2_multi_agent_attack.py
+        ├── task3_runtime_guardrails.py
+        ├── task4_autonomy_risk_metrics.ipynb
+        ├── demo/
+        │   ├── multi_agent_simulation.py
+        │   ├── prompt_injection_chain.py
+        │   ├── policy_engine_demo.py
+        │   └── unsafe_action_logger.py
+        └── final_report.md
