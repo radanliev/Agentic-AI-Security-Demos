@@ -1,0 +1,97 @@
+Lab aim
+
+Students will red team a small multi-agent reinforcement learning system, observe how low-noise adversarial inputs can shift collective behaviour, and then design countermeasures. The lab uses a PettingZoo-style environment, with a MARL training loop layered on top, so the same workflow can be discussed in terms of research, engineering, and security operations.
+
+Learning outcomes
+
+By the end of the lab, students should be able to:
+	1.	Model trust boundaries in a multi-agent AI system.
+	2.	Inject controlled adversarial perturbations into observations, rewards, and inter-agent messages.
+	3.	Measure how system-level behaviour changes under attack.
+	4.	Distinguish local agent correctness from global mission failure.
+	5.	Implement defensive controls: message validation, anomaly detection, trust scores, and adversarial training.
+
+⸻
+
+Demonstration - from start to finish.
+
+First, a benign multi-agent system in a distributed sensor-network task. Each agent observes a local slice of the environment and cooperates to detect events. Performance is stable.
+
+Next, a malicious agent is introduced. It does not “break” the system in an obvious way. Instead, it gradually poisons beliefs by emitting plausible but biased observations, and later manipulates the reward channel or shared coordination messages. At this point, each individual agent still looks superficially healthy, but the joint policy begins to drift.
+
+Finally, the class deploys defences and repeats the run. The system is not made perfectly safe, but the attack becomes harder to sustain, easier to detect, and less impactful.
+
+That arc is useful pedagogically because it shows that the failure mode is emergent, not local.
+
+⸻
+
+Lab architecture
+
+Use a three-layer design.
+
+The environment layer is a PettingZoo environment representing a cooperative task such as detection, search, or swarm coordination.
+
+The learning layer is a MARL training loop, optionally MARLlib-backed, with agents learning decentralised policies.
+
+The security layer contains a red-team controller that can modify one or more of the following:
+	•	local observations,
+	•	reward signals,
+	•	inter-agent messages,
+	•	agent identity metadata.
+
+This gives you three attack surfaces that map cleanly to your syllabus: belief poisoning, reward manipulation, and agent impersonation.
+
+⸻
+
+Suggested live demo flow
+
+Phase 1: Baseline behaviour
+
+Run the system without the adversary. Show:
+	•	episode reward over time,
+	•	coordination success rate,
+	•	communication graph density,
+	•	event detection latency.
+
+Explain that the agents have no explicit trust model; they simply optimise for reward.
+
+Phase 2: Belief poisoning
+
+Introduce a malicious agent or a compromised sensor feed. The attacker perturbs a subset of observations, but only slightly, so the values remain plausible.
+
+Expected effect:
+	•	local policies still appear valid,
+	•	but joint action quality degrades,
+	•	agents begin reinforcing bad beliefs,
+	•	coordination efficiency drops.
+
+Phase 3: Reward manipulation
+
+Modify the reward signal seen by one or more agents, or create a poisoned proxy reward in the communication layer.
+
+Expected effect:
+	•	training converges to a degraded policy,
+	•	agents optimise for the wrong objective,
+	•	the system may become confident while performing badly.
+
+Phase 4: Agent impersonation
+
+The malicious agent mimics a trusted node’s message pattern, message frequency, or identity token.
+
+Expected effect:
+	•	downstream agents privilege its messages,
+	•	coordination becomes asymmetric,
+	•	the attacker gains disproportionate influence.
+
+Phase 5: Defences
+
+Add one defence at a time and rerun the scenario.
+
+Good defence examples are:
+	•	trust-scored message acceptance,
+	•	anomaly detection on message timing and entropy,
+	•	reward clipping and consistency checks,
+	•	cross-agent consensus before action execution,
+	•	adversarial training with poisoned episodes.
+
+Show that defences reduce attack efficacy even if they do not eliminate it entirely.
