@@ -1,0 +1,23 @@
+name: New Demo
+description: Propose a new security demo
+title: "[DEMO] "
+labels: ["enhancement"]
+
+body:
+  - type: input
+    id: demo_name
+    attributes:
+      label: Demo Name
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+  - type: dropdown
+    id: threat_class
+    attributes:
+      label: Threat Class
+      options:
+        - Prompt Injection
+        - Data Poisoning
+        - Tool Exploit
+        - A2A Attack
