@@ -1,5 +1,7 @@
-# Week 1 demonstrations use only the Python standard library.
-# No third-party dependencies are required.
+# Core visualisation dependencies for Week 1
 
-# Python Version
-python>=3.11
+networkx>=3.3
+matplotlib>=3.9
+
+# Optional
+pandas>=2.2
