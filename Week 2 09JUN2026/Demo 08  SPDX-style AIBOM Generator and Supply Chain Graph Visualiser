@@ -1,0 +1,415 @@
+"""
+Demo 08
+SPDX-style AIBOM Generator and Supply Chain Graph Visualiser
+
+Purpose:
+- Automatically generate a lightweight SPDX-style AI Bill of Materials (AIBOM)
+- Model the agent supply chain as a dependency graph
+- Visualise provenance, tool dependencies, datasets, and retrieval components
+- Align with Week 2 themes:
+  - AI supply chain security
+  - provenance
+  - lineage
+  - dependency transparency
+  - AIBOM
+  - risk propagation
+
+Dependencies:
+    pip install networkx matplotlib
+
+Output files:
+- aibom.spdx.txt
+- aibom_supply_chain_graph.png
+"""
+
+from __future__ import annotations
+
+from dataclasses import dataclass, field
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Dict, List, Tuple
+
+import networkx as nx
+import matplotlib.pyplot as plt
+
+
+UTC = timezone.utc
+
+
+def utc_now_iso() -> str:
+    return datetime.now(tz=UTC).isoformat(timespec="seconds")
+
+
+@dataclass
+class Component:
+    name: str
+    version: str
+    supplier: str
+    component_type: str
+    licence: str = "NOASSERTION"
+    purl: str = ""
+    external_refs: List[str] = field(default_factory=list)
+    risk_notes: List[str] = field(default_factory=list)
+
+
+@dataclass
+class AIBOM:
+    system_name: str
+    system_version: str
+    generated_at: str
+    components: List[Component]
+    relationships: List[Tuple[str, str, str]]  # (source, relationship, target)
+
+    def to_spdx_text(self) -> str:
+        """
+        Render a lightweight SPDX-style text document.
+        This is intentionally SPDX-inspired rather than a strict SPDX 3.0 implementation.
+        """
+        lines: List[str] = []
+        lines.append("SPDXVersion: SPDX-2.3")
+        lines.append("DataLicense: CC0-1.0")
+        lines.append("SPDXID: SPDXRef-DOCUMENT")
+        lines.append(f"DocumentName: {self.system_name}-AIBOM")
+        lines.append(f"DocumentNamespace: urn:uuid:{self.system_name.lower().replace(' ', '-')}-{self.generated_at}")
+        lines.append(f"Creator: Tool: Agentic AI Security Bootcamp Demo 08")
+        lines.append(f"Created: {self.generated_at}")
+        lines.append("")
+        lines.append(f"##### System: {self.system_name}")
+        lines.append(f"##### Version: {self.system_version}")
+        lines.append("")
+
+        for idx, component in enumerate(self.components, start=1):
+            spdx_id = f"SPDXRef-{component.name.replace(' ', '_')}"
+            lines.append(f"##### Component {idx}")
+            lines.append(f"PackageName: {component.name}")
+            lines.append(f"SPDXID: {spdx_id}")
+            lines.append(f"PackageVersion: {component.version}")
+            lines.append(f"PackageSupplier: {component.supplier}")
+            lines.append(f"PackageLicenseDeclared: {component.licence}")
+            if component.purl:
+                lines.append(f"PackageDownloadLocation: {component.purl}")
+            if component.external_refs:
+                for ref in component.external_refs:
+                    lines.append(f"ExternalRef: {ref}")
+            if component.risk_notes:
+                for note in component.risk_notes:
+                    lines.append(f"RiskNote: {note}")
+            lines.append("")
+
+        lines.append("##### Relationships")
+        for source, rel, target in self.relationships:
+            lines.append(f"Relationship: SPDXRef-{source.replace(' ', '_')} {rel} SPDXRef-{target.replace(' ', '_')}")
+        lines.append("")
+
+        return "\n".join(lines)
+
+    def save_spdx(self, path: Path) -> None:
+        path.write_text(self.to_spdx_text(), encoding="utf-8")
+
+
+def build_sample_aibom() -> AIBOM:
+    """
+    Sample agent supply chain for a Week 2 demo.
+
+    The graph is intentionally simple but shows the key layers:
+    - system
+    - model
+    - datasets
+    - retrieval store
+    - orchestration framework
+    - tools
+    - external APIs
+    - logging/telemetry
+    """
+    components = [
+        Component(
+            name="Agentic Security Assistant",
+            version="1.0.0",
+            supplier="Internal",
+            component_type="system",
+            licence="NOASSERTION",
+            risk_notes=[
+                "Top-level autonomous workflow.",
+                "Trust boundary spans model, memory, tools, and external APIs.",
+            ],
+        ),
+        Component(
+            name="Foundation Model",
+            version="2026-06",
+            supplier="Model Provider",
+            component_type="model",
+            purl="pkg:generic/foundation-model@2026-06",
+            risk_notes=[
+                "Model outputs are influenced by prompts, memory, and tool state.",
+                "Requires provenance and update tracking.",
+            ],
+        ),
+        Component(
+            name="Incident Logs Dataset",
+            version="v2.4",
+            supplier="Security Operations",
+            component_type="dataset",
+            purl="pkg:generic/incident-logs@v2.4",
+            external_refs=["dataset-origin=internal-soc", "hash=sha256:abc123"],
+            risk_notes=[
+                "Training or retrieval data must be provenance-tagged.",
+                "May contain sensitive operational context.",
+            ],
+        ),
+        Component(
+            name="Security Runbooks Dataset",
+            version="v1.8",
+            supplier="Security Engineering",
+            component_type="dataset",
+            purl="pkg:generic/security-runbooks@v1.8",
+            external_refs=["dataset-origin=security-eng", "hash=sha256:def456"],
+            risk_notes=[
+                "Used for retrieval-augmented guidance.",
+                "Must be filtered for instruction integrity.",
+            ],
+        ),
+        Component(
+            name="Vector Retrieval Store",
+            version="v3",
+            supplier="Platform Team",
+            component_type="retrieval",
+            purl="pkg:generic/vector-store@v3",
+            risk_notes=[
+                "Primary attack surface for retrieval poisoning.",
+                "Requires checksum and lineage controls.",
+            ],
+        ),
+        Component(
+            name="Orchestration Framework",
+            version="langgraph-0.2",
+            supplier="Open Source",
+            component_type="orchestration",
+            purl="pkg:pypi/langgraph@0.2",
+            risk_notes=[
+                "Coordinates reasoning, tool invocation, and routing.",
+                "Should enforce policy gating and audit logging.",
+            ],
+        ),
+        Component(
+            name="Incident Triage Tool",
+            version="2.1",
+            supplier="Internal",
+            component_type="tool",
+            purl="pkg:generic/incident-triage-tool@2.1",
+            external_refs=["tool-interface=triage-api"],
+            risk_notes=[
+                "Tool calls should be authorised and logged.",
+                "Potential misuse if prompt injection reaches execution.",
+            ],
+        ),
+        Component(
+            name="Ticketing API",
+            version="2026-01",
+            supplier="External SaaS",
+            component_type="api",
+            purl="pkg:generic/ticketing-api@2026-01",
+            external_refs=["api-endpoint=tickets.example.invalid"],
+            risk_notes=[
+                "Third-party dependency with governance and availability risk.",
+            ],
+        ),
+        Component(
+            name="Telemetry and Audit Log",
+            version="1.0",
+            supplier="Internal",
+            component_type="logging",
+            purl="pkg:generic/audit-log@1.0",
+            risk_notes=[
+                "Supports forensic reconstruction and compliance evidence.",
+            ],
+        ),
+    ]
+
+    relationships = [
+        ("Agentic Security Assistant", "DEPENDS_ON", "Foundation Model"),
+        ("Agentic Security Assistant", "USES", "Orchestration Framework"),
+        ("Agentic Security Assistant", "READS_FROM", "Vector Retrieval Store"),
+        ("Agentic Security Assistant", "CALLS", "Incident Triage Tool"),
+        ("Incident Triage Tool", "CALLS", "Ticketing API"),
+        ("Vector Retrieval Store", "CONTAINS", "Incident Logs Dataset"),
+        ("Vector Retrieval Store", "CONTAINS", "Security Runbooks Dataset"),
+        ("Orchestration Framework", "EMITS", "Telemetry and Audit Log"),
+        ("Foundation Model", "GROUNDED_BY", "Vector Retrieval Store"),
+        ("Incident Triage Tool", "LOGGED_IN", "Telemetry and Audit Log"),
+    ]
+
+    return AIBOM(
+        system_name="Agentic Security Assistant",
+        system_version="1.0.0",
+        generated_at=utc_now_iso(),
+        components=components,
+        relationships=relationships,
+    )
+
+
+def build_graph(aibom: AIBOM) -> nx.DiGraph:
+    """
+    Build a directed graph from the AIBOM relationships.
+    """
+    g = nx.DiGraph()
+
+    component_lookup: Dict[str, Component] = {c.name: c for c in aibom.components}
+
+    for component in aibom.components:
+        g.add_node(
+            component.name,
+            component_type=component.component_type,
+            version=component.version,
+            supplier=component.supplier,
+            risk_notes=component.risk_notes,
+        )
+
+    for source, rel, target in aibom.relationships:
+        if source not in g:
+            g.add_node(source, component_type="unknown")
+        if target not in g:
+            g.add_node(target, component_type="unknown")
+        g.add_edge(source, target, relation=rel)
+
+    # Add a few provenance/risk annotations as graph metadata.
+    for node in g.nodes:
+        comp = component_lookup.get(node)
+        if comp and comp.risk_notes:
+            g.nodes[node]["risk_summary"] = comp.risk_notes[0]
+
+    return g
+
+
+def node_colour(component_type: str) -> str:
+    palette = {
+        "system": "#4C78A8",
+        "model": "#F58518",
+        "dataset": "#54A24B",
+        "retrieval": "#E45756",
+        "orchestration": "#72B7B2",
+        "tool": "#B279A2",
+        "api": "#FF9DA6",
+        "logging": "#9D755D",
+        "unknown": "#BAB0AC",
+    }
+    return palette.get(component_type, "#BAB0AC")
+
+
+def draw_graph(g: nx.DiGraph, out_path: Path) -> None:
+    """
+    Render the dependency graph to a PNG file.
+    """
+    plt.figure(figsize=(16, 10))
+
+    pos = nx.spring_layout(g, seed=42, k=1.1)
+
+    node_colours = [
+        node_colour(g.nodes[n].get("component_type", "unknown"))
+        for n in g.nodes()
+    ]
+
+    nx.draw_networkx_nodes(
+        g,
+        pos,
+        node_size=3200,
+        node_color=node_colours,
+        linewidths=1.5,
+        edgecolors="black",
+    )
+
+    nx.draw_networkx_edges(
+        g,
+        pos,
+        arrows=True,
+        arrowsize=18,
+        width=1.6,
+        connectionstyle="arc3,rad=0.08",
+    )
+
+    labels = {
+        n: f"{n}\n({g.nodes[n].get('component_type', 'unknown')})"
+        for n in g.nodes()
+    }
+    nx.draw_networkx_labels(g, pos, labels=labels, font_size=9)
+
+    edge_labels = {
+        (u, v): g.edges[u, v].get("relation", "")
+        for u, v in g.edges()
+    }
+    nx.draw_networkx_edge_labels(
+        g,
+        pos,
+        edge_labels=edge_labels,
+        font_size=8,
+        label_pos=0.5,
+        rotate=False,
+    )
+
+    plt.title("SPDX-style AIBOM Supply Chain Graph", fontsize=16)
+    plt.axis("off")
+    plt.tight_layout()
+    plt.savefig(out_path, dpi=200, bbox_inches="tight")
+    plt.show()
+
+
+def print_summary(aibom: AIBOM, g: nx.DiGraph) -> None:
+    """
+    Print a concise supply-chain summary for the live demo.
+    """
+    print("=" * 80)
+    print("AIBOM SUMMARY")
+    print("=" * 80)
+    print(f"System: {aibom.system_name}")
+    print(f"Version: {aibom.system_version}")
+    print(f"Generated: {aibom.generated_at}")
+    print(f"Components: {len(aibom.components)}")
+    print(f"Relationships: {len(aibom.relationships)}")
+    print()
+
+    print("Nodes by type:")
+    type_counts: Dict[str, int] = {}
+    for node in g.nodes:
+        ctype = g.nodes[node].get("component_type", "unknown")
+        type_counts[ctype] = type_counts.get(ctype, 0) + 1
+    for ctype, count in sorted(type_counts.items()):
+        print(f"  - {ctype}: {count}")
+
+    print()
+    print("High-value trust boundaries:")
+    for source, target, relation in [
+        ("Agentic Security Assistant", "Foundation Model", "model dependency"),
+        ("Vector Retrieval Store", "Incident Logs Dataset", "retrieval content"),
+        ("Incident Triage Tool", "Ticketing API", "external API call"),
+    ]:
+        print(f"  - {source} -> {target} [{relation}]")
+
+    print()
+    print("Primary risk surfaces:")
+    for component in aibom.components:
+        if component.risk_notes:
+            print(f"  - {component.name}: {component.risk_notes[0]}")
+
+
+def main() -> None:
+    aibom = build_sample_aibom()
+    graph = build_graph(aibom)
+
+    out_dir = Path(".")
+    spdx_path = out_dir / "aibom.spdx.txt"
+    graph_path = out_dir / "aibom_supply_chain_graph.png"
+
+    aibom.save_spdx(spdx_path)
+    draw_graph(graph, graph_path)
+    print_summary(aibom, graph)
+
+    print()
+    print(f"Saved SPDX-style AIBOM to: {spdx_path.resolve()}")
+    print(f"Saved supply chain graph to: {graph_path.resolve()}")
+    print()
+    print("Demo note: in the live session, walk from the system node outward to")
+    print("show how provenance, retrieval, tools, and external APIs expand the")
+    print("attack surface and create propagation paths for data-layer attacks.")
+
+
+if __name__ == "__main__":
+    main()
