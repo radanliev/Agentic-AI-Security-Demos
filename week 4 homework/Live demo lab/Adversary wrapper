@@ -1,0 +1,24 @@
+class RedTeamWrapper:
+    def __init__(self, env, malicious_agent="agent_0",
+                 poison_rate=0.1, reward_shift=0.2, impersonate=False):
+        self.env = env
+        self.malicious_agent = malicious_agent
+        self.poison_rate = poison_rate
+        self.reward_shift = reward_shift
+        self.impersonate = impersonate
+
+    def corrupt_observation(self, obs):
+        # Small, plausible perturbations rather than obvious noise
+        if random.random() < self.poison_rate:
+            obs["local_state"] = obs["local_state"] + epsilon_like_shift(obs["local_state"])
+        return obs
+
+    def corrupt_reward(self, reward, agent):
+        if agent == self.malicious_agent:
+            return reward + self.reward_shift
+        return reward
+
+    def spoof_identity(self, message):
+        if self.impersonate:
+            message["sender_id"] = "trusted_agent"
+        return message

@@ -1,0 +1,17 @@
+week1/
+
+├── core.py
+
+├── demo_01_observability.py
+
+├── demo_02_prompt_injection.py
+
+├── demo_03_memory_poisoning.py
+
+├── demo_04_runtime_controls.py
+
+├── demo_05_red_team_metrics.py
+
+├── README.md
+
+└── requirements.txt
