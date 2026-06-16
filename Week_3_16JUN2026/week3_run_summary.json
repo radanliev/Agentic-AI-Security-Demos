@@ -1,0 +1,76 @@
+{
+  "demo_count": 5,
+  "demos": [
+    {
+      "artifacts": [
+        "artifacts/trust_boundary_system.json",
+        "artifacts/trust_boundary_attack.json",
+        "artifacts/trust_boundary_report.md"
+      ],
+      "name": "trust-boundary",
+      "standards": [
+        "NIST AI RMF (Map)",
+        "ISO/IEC 38507",
+        "UK NCSC secure AI guidance"
+      ],
+      "summary": "Mapped trust boundaries between planner, executor, memory, and external API; demonstrated malicious API injection and containment."
+    },
+    {
+      "artifacts": [
+        "artifacts/a2a_messages.json",
+        "artifacts/a2a_impersonation_report.md"
+      ],
+      "name": "a2a",
+      "standards": [
+        "NIST AI RMF (Map)",
+        "OWASP Agentic Skills",
+        "ISO/IEC 38507"
+      ],
+      "summary": "Demonstrated forged agent messages, message signing, and identity validation for agent-to-agent communication."
+    },
+    {
+      "artifacts": [
+        "artifacts/capability_boundary_decisions.json",
+        "artifacts/capability_boundary_report.md"
+      ],
+      "name": "capability",
+      "standards": [
+        "ISO/IEC 38507",
+        "UK NCSC secure AI guidance",
+        "NIST AI RMF (Map/Manage)"
+      ],
+      "summary": "Applied allow/deny policies across actions, data, tools, and scope to block unsafe agent behaviour."
+    },
+    {
+      "artifacts": [
+        "artifacts/attack_chain_events.json",
+        "artifacts/attack_chain_defence.json",
+        "artifacts/attack_chain_report.md"
+      ],
+      "name": "attack-chain",
+      "standards": [
+        "NIST AI RMF",
+        "MITRE ATLAS",
+        "UK NCSC guidance",
+        "ENISA guidance"
+      ],
+      "summary": "Simulated a context-to-impact attack chain and then interrupted it with layered controls."
+    },
+    {
+      "artifacts": [
+        "artifacts/aibom.json",
+        "artifacts/secure_autonomous_infrastructure.yaml",
+        "artifacts/runtime_protection_report.md"
+      ],
+      "name": "runtime",
+      "standards": [
+        "NIST AI RMF (Manage)",
+        "ISO/IEC 42001",
+        "UK NCSC guidance",
+        "ENISA guidance"
+      ],
+      "summary": "Created a build/deploy/runtime protection view for a secure autonomous agent stack."
+    }
+  ],
+  "repo": "Week_3_16JUN2026"
+}

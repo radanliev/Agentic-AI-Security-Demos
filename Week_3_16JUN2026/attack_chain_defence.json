@@ -1,0 +1,27 @@
+[
+  {
+    "control": "retrieval filter",
+    "outcome": "blocked",
+    "stage": "context_injection"
+  },
+  {
+    "control": "reasoning audit",
+    "outcome": "blocked",
+    "stage": "reasoning_manipulation"
+  },
+  {
+    "control": "tool validation",
+    "outcome": "blocked",
+    "stage": "tool_exploitation"
+  },
+  {
+    "control": "message integrity checks",
+    "outcome": "blocked",
+    "stage": "cross_agent_propagation"
+  },
+  {
+    "control": "runtime policy enforcement",
+    "outcome": "prevented",
+    "stage": "impact"
+  }
+]
