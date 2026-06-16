@@ -1,0 +1,51 @@
+{
+  "boundaries": [
+    {
+      "control": "approval gate",
+      "from": "Human Operator",
+      "to": "Planner Agent"
+    },
+    {
+      "control": "policy check",
+      "from": "Planner Agent",
+      "to": "Executor Agent"
+    },
+    {
+      "control": "response validation",
+      "from": "External API",
+      "to": "Planner Agent"
+    },
+    {
+      "control": "retrieval filtering",
+      "from": "Memory Store",
+      "to": "Planner Agent"
+    }
+  ],
+  "components": [
+    {
+      "name": "Human Operator",
+      "role": "supervisor",
+      "trust": "high"
+    },
+    {
+      "name": "Planner Agent",
+      "role": "planner",
+      "trust": "medium"
+    },
+    {
+      "name": "Executor Agent",
+      "role": "executor",
+      "trust": "medium"
+    },
+    {
+      "name": "External API",
+      "role": "untrusted external dependency",
+      "trust": "low"
+    },
+    {
+      "name": "Memory Store",
+      "role": "retrieval context",
+      "trust": "low"
+    }
+  ]
+}

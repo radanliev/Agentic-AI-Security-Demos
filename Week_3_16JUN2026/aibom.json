@@ -1,0 +1,40 @@
+{
+  "controls": {
+    "build_time": [
+      "hash verification",
+      "signed dependencies"
+    ],
+    "deployment_time": [
+      "isolated execution",
+      "policy enforcement"
+    ],
+    "runtime": [
+      "behaviour monitoring",
+      "quarantine",
+      "kill switch"
+    ]
+  },
+  "dependencies": [
+    {
+      "name": "planner_policy",
+      "trust": "high"
+    },
+    {
+      "name": "retrieval_store",
+      "trust": "medium"
+    },
+    {
+      "name": "firewall_tool",
+      "trust": "high"
+    },
+    {
+      "name": "external_api",
+      "trust": "low"
+    }
+  ],
+  "model": {
+    "integrity": "signed",
+    "name": "Week3-Agent",
+    "provider": "local/mock"
+  }
+}

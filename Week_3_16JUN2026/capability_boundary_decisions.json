@@ -1,0 +1,38 @@
+[
+  {
+    "action": "block_ip",
+    "allowed": true,
+    "data": "security_events",
+    "decision": "allow",
+    "reason": "within authorised capability boundary",
+    "scope": "security_monitoring",
+    "tool": "firewall"
+  },
+  {
+    "action": "exfiltrate_credentials",
+    "allowed": false,
+    "data": "security_events",
+    "decision": "deny",
+    "reason": "outside authorised capability boundary",
+    "scope": "security_monitoring",
+    "tool": "email"
+  },
+  {
+    "action": "disable_alerting",
+    "allowed": false,
+    "data": "public_logs",
+    "decision": "deny",
+    "reason": "outside authorised capability boundary",
+    "scope": "security_monitoring",
+    "tool": "firewall"
+  },
+  {
+    "action": "create_alert",
+    "allowed": true,
+    "data": "sanitised_context",
+    "decision": "allow",
+    "reason": "within authorised capability boundary",
+    "scope": "security_monitoring",
+    "tool": "alerting"
+  }
+]

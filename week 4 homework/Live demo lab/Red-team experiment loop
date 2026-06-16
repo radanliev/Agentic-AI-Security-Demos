@@ -1,0 +1,27 @@
+def run_episode(env, policy_fn, attacker=None):
+    obs = env.reset()
+    episode_log = []
+
+    for t in range(env.max_cycles):
+        for agent in env.agents:
+            current_obs = obs[agent]
+
+            if attacker is not None:
+                current_obs = attacker.corrupt_observation(current_obs)
+
+            action = policy_fn(agent, current_obs)
+            env.step(action)
+
+            reward = env.rewards.get(agent, 0.0)
+            if attacker is not None:
+                reward = attacker.corrupt_reward(reward, agent)
+
+            episode_log.append({
+                "t": t,
+                "agent": agent,
+                "obs": current_obs,
+                "action": action,
+                "reward": reward
+            })
+
+    return episode_log

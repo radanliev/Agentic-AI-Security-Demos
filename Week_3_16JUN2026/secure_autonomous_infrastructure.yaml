@@ -1,0 +1,24 @@
+# Secure Autonomous Infrastructure
+model:
+  name: Week3-Agent
+  integrity: signed
+controls:
+  build_time:
+    - hash verification
+    - signed dependencies
+  deployment_time:
+    - isolated execution
+    - policy enforcement
+  runtime:
+    - behaviour monitoring
+    - quarantine
+    - kill switch
+monitoring:
+  signals:
+    - unexpected reasoning path
+    - unexpected tool execution
+    - suspicious agent-to-agent message
+  response:
+    - block execution
+    - isolate agent
+    - alert operator

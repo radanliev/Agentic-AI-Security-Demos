@@ -1,0 +1,36 @@
+from pettingzoo import AECEnv
+from pettingzoo.utils import agent_selector
+
+class SensorSwarmEnv(AECEnv):
+    def __init__(self, n_agents=5, max_cycles=100):
+        super().__init__()
+        self.n_agents = n_agents
+        self.max_cycles = max_cycles
+        self.possible_agents = [f"agent_{i}" for i in range(n_agents)]
+        self.agents = self.possible_agents[:]
+        self._agent_selector = agent_selector(self.agents)
+        self.agent_selection = self._agent_selector.next()
+
+        # Define observation, action, and reward spaces here
+        # Keep them simple for teaching: discrete actions, vector observations
+
+    def observe(self, agent):
+        # Return local observation for this agent
+        # Optionally include a communication payload from neighbours
+        return {
+            "local_state": ...,
+            "messages": ...,
+            "trust_score": ...
+        }
+
+    def step(self, action):
+        agent = self.agent_selection
+
+        # Apply action to environment dynamics
+        # Update shared state, reward, done flags
+
+        self.agent_selection = self._agent_selector.next()
+
+    def reset(self, seed=None, options=None):
+        # Reset environment state and agents
+        ...
